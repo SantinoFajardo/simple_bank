@@ -1,0 +1,12 @@
+version: "2"
+sql:
+  - name: "db"
+    queries: "./db/query" # where the queries will be stored
+    schema: "./db/migration" # where are the schema located
+    engine: "postgresql" # db engine
+    gen:
+      go:
+        package: "db" # where the queries with GO will be created
+        out: "./db/sqlc"
+        sql_package: "database/sql" # sql package that will use
+        emit_json_tags: true # activate the generation of JSON labels
