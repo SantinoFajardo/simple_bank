@@ -10,3 +10,4 @@ sql:
         out: "./db/sqlc"
         sql_package: "database/sql" # sql package that will use
         emit_json_tags: true # activate the generation of JSON labels
+        emit_interface: true
