@@ -15,8 +15,9 @@ func deleteAccountByID(accountID int64) {
 }
 
 func createRandomAccount(t *testing.T) Account { // This function doesn't has the 'Test' prefix so will doesn't run with the tests
+	user := createRandomUser(t)
 	arg := CreateAccountParams{
-		Owner:    util.RandomOwner(),
+		Owner:    user.Username,
 		Balance:  util.RandomMoney(),
 		Currency: util.RandomCurrency(),
 	}
