@@ -56,6 +56,19 @@ func TestGetAccountApi(t *testing.T) {
 				require.Equal(t, http.StatusNotFound, recorder.Code)
 			},
 		},
+		{
+			name:      "BadRequest",
+			accountID: 0,
+			buildStubs: func(store *mockdb.MockStore) {
+				// In this case the function will not be called because the function will return an error before
+				store.EXPECT().
+					GetAccount(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
 	}
 
 	for i := range testCases {
