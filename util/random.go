@@ -44,9 +44,7 @@ func RandomMoney() int64 {
 // RandomCurrency generate a random currency symbol
 func RandomCurrency() string {
 	availableCurrencies := []string{
-		"USD",
-		"EUR",
-		"ARS",
+		EUR, USD, ARS,
 	}
 	n := len(availableCurrencies)
 	return availableCurrencies[rand.Intn(n)]
