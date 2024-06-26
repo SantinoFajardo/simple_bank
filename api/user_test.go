@@ -23,7 +23,7 @@ type eqCreateUserParamsMatcher struct {
 	password string
 }
 
-func (e eqCreateUserParamsMatcher) Matches(x interface{}) bool {
+func (e eqCreateUserParamsMatcher) Matches(x interface{}) bool { // 'x' it's the params which db.CreateUser is called on the API
 	arg, ok := x.(db.CreateUserParams)
 	if !ok {
 		return false
