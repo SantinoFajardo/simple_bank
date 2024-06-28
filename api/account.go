@@ -2,7 +2,6 @@ package api
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -53,7 +52,6 @@ func (server *Server) getAccountByID(ctx *gin.Context) {
 		return
 	}
 
-	fmt.Println(req.ID)
 	account, err := server.store.GetAccount(ctx, req.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
