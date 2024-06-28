@@ -68,3 +68,10 @@ func TestInvalidPasetoToken(t *testing.T) {
 	require.EqualError(t, err, ErrorInvalidToken.Error())
 	require.Nil(t, payload)
 }
+
+func TestInvalidLengthPasetoToken(t *testing.T) {
+	newPasetoMaker, err := NewPasetoMaker(util.RandomString(31))
+	require.Error(t, err)
+	require.EqualError(t, err, "invalid key size")
+	require.Empty(t, newPasetoMaker)
+}

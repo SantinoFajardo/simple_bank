@@ -66,3 +66,10 @@ func TestInvalidJWTToken(t *testing.T) {
 	require.Nil(t, payload)
 
 }
+
+func TestInvalidLengthJWTToken(t *testing.T) {
+	newPasetoMaker, err := NewJWTMaker(util.RandomString(31))
+	require.Error(t, err)
+	require.EqualError(t, err, "invalid key size")
+	require.Empty(t, newPasetoMaker)
+}
