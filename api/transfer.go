@@ -54,7 +54,7 @@ func (server *Server) transfer(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{"data": result, "error": nil})
+	ctx.JSON(http.StatusOK, gin.H{"data": result, "error": nil})
 }
 
 func (server *Server) validCurrencyAccount(ctx *gin.Context, accountID int64, currency string) (bool, db.Account) {
