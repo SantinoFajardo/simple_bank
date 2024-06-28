@@ -31,14 +31,16 @@ func NewServer(config util.Config, store db.Store) (*Server, error) {
 		v.RegisterValidation("currency", validCurrency)
 	}
 
-	router.POST("/accounts", server.createAccount)
-	router.GET("/accounts/:id", server.getAccountByID)
-	router.GET("/accounts", server.getAccountsList)
-
-	router.POST("/transfer", server.transfer)
-
-	router.POST("/users", server.createUser)
 	router.POST("/users/login", server.loginUser)
+	router.POST("/users", server.createUser)
+
+	authRouter := router.Group("/").Use(authMiddleware(server.tokenMaker))
+
+	authRouter.POST("/accounts", server.createAccount)
+	authRouter.GET("/accounts/:id", server.getAccountByID)
+	authRouter.GET("/accounts", server.getAccountsList)
+
+	authRouter.POST("/transfer", server.transfer)
 
 	server.router = router
 	return server, nil
