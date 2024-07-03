@@ -20,6 +20,9 @@ dropdb: # run `make dropdb` to drop the simple_bank database
 migrateup: # run `make migrateup` to migrate up the database
 	migrate -path db/migration -database "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:$(POSTGRES_PORT)/$(POSTGRES_DB)?sslmode=disable" -verbose up
 
+migrateup-aws-db:
+	migrate -path db/migration -database "postgresql://$(POSTGRES_USER):$(POSTGRES_AWS_PASSWORD)@${POSTGRES_AWS_HOST}:$(POSTGRES_PORT)/$(POSTGRES_DB)" -verbose up
+
 migrateup1:
 	migrate -path db/migration -database "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:$(POSTGRES_PORT)/$(POSTGRES_DB)?sslmode=disable" -verbose up 1
 
