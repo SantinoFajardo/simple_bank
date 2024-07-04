@@ -2,7 +2,8 @@
 
 set -e
 echo "run db migration"
-/app/migrate -path /app/migration -database "$DB_SOURCE" -verbose up
+source app.env
+/app/migrate -path /app/app/migration -database "$DB_SOURCE" -verbose up
 
 echo "start the app"
 exec "$@"
