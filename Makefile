@@ -1,9 +1,9 @@
-include app.env
-export $(shell sed 's/=.*//' app.env)
+include app.testing.env
+export $(shell sed 's/=.*//' app.testing.env)
 
 # Function to load env variables from app.env
 load-env:
-	@export $(shell sed 's/=.*//' app.env)
+	@export $(shell sed 's/=.*//' app.testing.env)
 
 image:
 	docker build -t simplebank:latest .
