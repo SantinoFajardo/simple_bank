@@ -216,3 +216,37 @@ Now we need add some extra code in to our `runGatewayServer` so we can handle th
 	fs := http.FileServer(http.Dir("./doc/swagger")) // File that contain the ui portion
 	mux.Handle("/swagger/", http.StripPrefix("/swagger/", fs)) // the /swagger endpoint will show that ui
 ```
+
+Now we have a lot of frontend files that we need to load into our `.Dockerfile` and this can be annoying. To fix this we can use the module `statik` to load a binary based on the frontend files so we can use just that file to load into our docker file.
+Another approach is that since the static files will be located in the binary backend, all will be loaded on the server memory that has speciall effects
+
+Inside the `tools.go` file paste the blank module `github.com/rakyll/statik`
+After run the `go mod tidy` to install the dependencies on our projects and `go install github.com/rakyll/statik` to install the cli so we can run the `statik` command, we can add the command to generate the binary after each time that the frontend swager changed.
+`statik -src=./doc/swagger` to create the binary based on the files on that path and `-dest=./doc` to push the binary in that location
+
+Add the blank module on the `main.go` file so the `init()` functions will be called when the server run (`_ github.com/santinofajardo/simpleBank/doc/statik`).
+Made changes on the `runGatewayServer()` so we can use this binary file instead of the entire folder
+
+```go
+	staticFs, err := fs.New()
+	if err != nil {
+		log.Fatal("cannot create statik fs")
+	}
+
+	swaggerHandler := http.StripPrefix("/swagger/", http.FileServer(staticFs))
+	mux.Handle("/swagger/", swaggerHandler)
+```
+
+We cann add more information ass the name, some description of the endpoint so can be used by the openapi to show it.
+Here an example:
+
+```proto
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to create a new user";
+            summary: "Create a new user";
+            external_docs: {
+              url: "https://github.com/grpc-ecosystem/grpc-gateway";
+              description: "Find out more Echo";
+        };
+        }
+```
