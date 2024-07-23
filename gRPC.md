@@ -250,3 +250,33 @@ Here an example:
         };
         }
 ```
+
+<h2>Creating validations to the gRPC parameters and send better responses</h2>
+ 
+Inside the `./validation/validator` will be located the validations functions.
+
+On this example we are validating the `create_user` requests and the body parameters
+
+```go
+func validateCreateUserRequest(req *pb.CreateUserRequest) (violations []*errdetails.BadRequest_FieldViolation) {
+	if err := validation.ValidateUsername(req.GetUsername()); err != nil {
+		violations = append(violations, fieldViolation("username", err))
+	}
+
+	if err := validation.ValidatePassword(req.GetPassword()); err != nil {
+		violations = append(violations, fieldViolation("password", err))
+	}
+
+	if err := validation.ValidateFullName(req.GetFullName()); err != nil {
+		violations = append(violations, fieldViolation("full_name", err))
+	}
+
+	if err := validation.ValidateEmail(req.GetEmail()); err != nil {
+		violations = append(violations, fieldViolation("email", err))
+	}
+
+	return violations
+}
+```
+
+And here we are implementing the function on the `create_user` endpoint function
