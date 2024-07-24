@@ -17,13 +17,21 @@ import (
 )
 
 func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UpdateUserResponse, error) {
+	payload, err := server.authorizeUser(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Unauthenticated, "Unaunthenticated")
+	}
 	violations := validateUpdateUserRequest(req)
 	if violations != nil {
 		return nil, invalidArgumentError(violations)
 	}
 
+	if payload.UserName != req.GetUsername() {
+		return nil, status.Errorf(codes.Unauthenticated, "incorrect permissions")
+	}
+
 	arg := db.UpdateUserParams{
-		Username: req.GetUsername(),
+		Username: payload.UserName,
 		FullName: sql.NullString{
 			String: req.GetFullName(),
 			Valid:  req.FullName != nil,
