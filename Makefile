@@ -9,13 +9,13 @@ image:
 	docker build -t simplebank:latest .
 
 postgres: # run `make postgres` to create the postgres container on the postgres:latest image
-	docker run --name $(POSTGRES_CONTAINER_NAME) --network ${BANK_NETWORK} -p $(POSTGRES_PORT):$(POSTGRES_PORT) -e GIN_MODE=release -e POSTGRES_USER=$(POSTGRES_USER) -e POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) -d $(POSTGRES_IMAGE)
+	docker run --name postgres -p 5432:5432 -e GIN_MODE=release -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres
 
 createdb: # run `make createdb` to create the simple_bank database
-	docker exec -it $(POSTGRES_CONTAINER_NAME) createdb --username=$(POSTGRES_USER) --owner=$(POSTGRES_USER) $(POSTGRES_DB)
+	docker exec -it postgres createdb --username=root --owner=root simple_bank
 
 dropdb: # run `make dropdb` to drop the simple_bank database
-	docker exec -it $(POSTGRES_CONTAINER_NAME) dropdb $(POSTGRES_DB)
+	docker exec -it postgres dropdb simple_bank
 
 migrateup: # run `make migrateup` to migrate up the database
 	migrate -path db/migration -database "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:$(POSTGRES_PORT)/$(POSTGRES_DB)?sslmode=disable" -verbose up
