@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/hibiken/asynq"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
@@ -22,6 +23,7 @@ import (
 	"github.com/santinofajardo/simpleBank/gapi"
 	"github.com/santinofajardo/simpleBank/pb"
 	"github.com/santinofajardo/simpleBank/util"
+	"github.com/santinofajardo/simpleBank/workers"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -46,8 +48,24 @@ func main() {
 	runDBMigration(config.MigrationUrl, config.DBSource)
 
 	store := db.NewStore(conn)
-	go runGatewayServer(config, store)
-	rungRPCServer(config, store)
+
+	redisOpt := asynq.RedisClientOpt{
+		Addr: config.RedisAddress,
+	}
+	distributor := workers.NewReditTaskDistributor(redisOpt)
+
+	go runTaskProcessor(redisOpt, store)
+	go runGatewayServer(config, store, distributor)
+	rungRPCServer(config, store, distributor)
+}
+
+func runTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store) {
+	taskProcessor := workers.NewRedisTaskProcessor(redisOpt, store)
+	log.Info().Msg("start task processor")
+	err := taskProcessor.Start()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to start task processor")
+	}
 }
 
 func runDBMigration(migrationURL string, dbSource string) {
@@ -61,8 +79,8 @@ func runDBMigration(migrationURL string, dbSource string) {
 	}
 }
 
-func runGatewayServer(config util.Config, store db.Store) {
-	server, err := gapi.NewServer(config, store)
+func runGatewayServer(config util.Config, store db.Store, distributor workers.TaskDistributor) {
+	server, err := gapi.NewServer(config, store, distributor)
 	if err != nil {
 		log.Info().Err(err).Msg("cannot create server")
 	}
@@ -108,8 +126,8 @@ func runGatewayServer(config util.Config, store db.Store) {
 	}
 }
 
-func rungRPCServer(config util.Config, store db.Store) {
-	server, err := gapi.NewServer(config, store)
+func rungRPCServer(config util.Config, store db.Store, distributor workers.TaskDistributor) {
+	server, err := gapi.NewServer(config, store, distributor)
 	if err != nil {
 		log.Info().Err(err).Msg("cannot create server")
 	}

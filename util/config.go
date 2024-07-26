@@ -18,6 +18,7 @@ type Config struct {
 	TokenDuration        time.Duration `mapstructure:"TOKEN_DURATION"`
 	RefreshTokenDuration time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
 	MigrationUrl         string        `mapstructure:"MIGRATION_URL"`
+	RedisAddress         string        `mapstructure:"REDIS_ADDRESS"`
 }
 
 // LoadConfig read configuration from file or environment variables.
