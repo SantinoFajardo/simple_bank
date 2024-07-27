@@ -86,3 +86,30 @@ Add the configurations to take the critical tasks also
 		},
 	)
 ```
+
+<h3>Adding error handlers</h3>
+<h4>In order to handle the errors when the distributor or processor failed we need add te next code in to our configuration</h4>
+```go
+	server := asynq.NewServer(
+		redisOpt, asynq.Config{
+			Queues: map[string]int{
+				QueueCritical: 10,
+				QueueDefault:  5,
+			},
+			ErrorHandler: asynq.ErrorHandlerFunc(func(ctx context.Context, task *asynq.Task, err error) {
+				log.Error().
+					Err(err).
+					Str("type", task.Type()).
+					Bytes("payload", task.Payload()).
+					Msg("process task failed")
+			}),
+		},
+	)
+```
+
+We can also settup the default logs of the asynq server used for example to show when the server is running. The logic will be inside `./workers/logger.go`. Basically we are overriding the Loggers functions that are inside the asynq library.
+And now we need add this logger configuration to the asynq server configuration.
+
+```go
+    Logger: NewLogger(),
+```
