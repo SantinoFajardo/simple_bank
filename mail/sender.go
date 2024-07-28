@@ -46,6 +46,7 @@ func (sender *GmailSender) SendEmail(
 	attachFiles []string,
 ) error {
 	e := email.NewEmail()
+	e.HTML = []byte(content)
 	e.From = fmt.Sprintf("%s <%s>", sender.name, sender.fromEmailAddress)
 	e.To = to
 	e.Subject = subject

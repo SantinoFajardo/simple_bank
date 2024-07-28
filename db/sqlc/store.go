@@ -11,6 +11,7 @@ type Store interface {
 	Querier
 	TransferTransaction(ctx context.Context, args TransferTransactionParams) (TransferTransactionResult, error)
 	CreateUserTransaction(ctx context.Context, args CreateUserTransactionParams) (CreateUserTransactionResult, error)
+	VerifyEmailTransaction(ctx context.Context, args VerifyEmailTransactionParams) (VerifyEmailTransactionResult, error)
 }
 
 // SQLStore provides all functions to execute SQL queries and transactions
