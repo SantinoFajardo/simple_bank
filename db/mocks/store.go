@@ -409,3 +409,18 @@ func (mr *MockStoreMockRecorder) UpdateVerifyEmail(arg0, arg1 interface{}) *gomo
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateVerifyEmail", reflect.TypeOf((*MockStore)(nil).UpdateVerifyEmail), arg0, arg1)
 }
+
+// VerifyEmailTransaction mocks base method.
+func (m *MockStore) VerifyEmailTransaction(arg0 context.Context, arg1 db.VerifyEmailTransactionParams) (db.VerifyEmailTransactionResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VerifyEmailTransaction", arg0, arg1)
+	ret0, _ := ret[0].(db.VerifyEmailTransactionResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// VerifyEmailTransaction indicates an expected call of VerifyEmailTransaction.
+func (mr *MockStoreMockRecorder) VerifyEmailTransaction(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyEmailTransaction", reflect.TypeOf((*MockStore)(nil).VerifyEmailTransaction), arg0, arg1)
+}
