@@ -2,16 +2,16 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"testing"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/santinofajardo/simpleBank/util"
 	"github.com/stretchr/testify/require"
 )
 
 func deleteAccountByID(accountID int64) {
-	testQueries.DeleteAccount(context.Background(), accountID)
+	testStore.DeleteAccount(context.Background(), accountID)
 }
 
 func createRandomAccount(t *testing.T) Account { // This function doesn't has the 'Test' prefix so will doesn't run with the tests
@@ -22,7 +22,7 @@ func createRandomAccount(t *testing.T) Account { // This function doesn't has th
 		Currency: util.RandomCurrency(),
 	}
 
-	account, err := testQueries.CreateAccount(context.Background(), arg)
+	account, err := testStore.CreateAccount(context.Background(), arg)
 
 	// Tests
 	require.NoError(t, err)
@@ -47,7 +47,7 @@ func TestGetAccount(t *testing.T) {
 
 	defer deleteAccountByID(account1.ID)
 
-	account2, err := testQueries.GetAccount(context.Background(), account1.ID)
+	account2, err := testStore.GetAccount(context.Background(), account1.ID)
 
 	// Tests
 	require.NoError(t, err)
@@ -65,7 +65,7 @@ func TestUpdateAccount(t *testing.T) {
 
 	defer deleteAccountByID(account1.ID)
 
-	account2, err := testQueries.UpdateAccount(
+	account2, err := testStore.UpdateAccount(
 		context.Background(),
 		UpdateAccountParams{account1.ID, util.RandomMoney()})
 
@@ -83,14 +83,14 @@ func TestUpdateAccount(t *testing.T) {
 func TestDeleteAccount(t *testing.T) {
 	account1 := createRandomAccount(t)
 
-	err := testQueries.DeleteAccount(context.Background(), account1.ID)
+	err := testStore.DeleteAccount(context.Background(), account1.ID)
 	// Tests
 	require.NoError(t, err)
 
-	account2, err := testQueries.GetAccount(context.Background(), account1.ID)
+	account2, err := testStore.GetAccount(context.Background(), account1.ID)
 
 	require.Error(t, err)
-	require.EqualError(t, err, sql.ErrNoRows.Error())
+	require.EqualError(t, err, pgx.ErrNoRows.Error())
 	require.Empty(t, account2)
 }
 
@@ -100,7 +100,7 @@ func TestListAccounts(t *testing.T) {
 		lastAccount = createRandomAccount(t)
 	}
 
-	accounts, err := testQueries.ListAccounts(context.Background(), ListAccountsParams{lastAccount.Owner, 5, 0})
+	accounts, err := testStore.ListAccounts(context.Background(), ListAccountsParams{lastAccount.Owner, 5, 0})
 
 	// Tests
 	require.NoError(t, err)

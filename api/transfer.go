@@ -1,12 +1,12 @@
 package api
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5"
 	db "github.com/santinofajardo/simpleBank/db/sqlc"
 	"github.com/santinofajardo/simpleBank/token"
 )
@@ -60,7 +60,7 @@ func (server *Server) transfer(ctx *gin.Context) {
 func (server *Server) validCurrencyAccount(ctx *gin.Context, accountID int64, currency string) (bool, db.Account) {
 	account, err := server.store.GetAccount(ctx, accountID)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err, "data": nil})
 			return false, db.Account{}
 		}

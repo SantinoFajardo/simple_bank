@@ -26,7 +26,7 @@ type CreateTransferParams struct {
 }
 
 func (q *Queries) CreateTransfer(ctx context.Context, arg CreateTransferParams) (Transfer, error) {
-	row := q.db.QueryRowContext(ctx, createTransfer, arg.FromAccountID, arg.ToAccountID, arg.Amount)
+	row := q.db.QueryRow(ctx, createTransfer, arg.FromAccountID, arg.ToAccountID, arg.Amount)
 	var i Transfer
 	err := row.Scan(
 		&i.ID,
@@ -44,7 +44,7 @@ WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetTransfer(ctx context.Context, id int64) (Transfer, error) {
-	row := q.db.QueryRowContext(ctx, getTransfer, id)
+	row := q.db.QueryRow(ctx, getTransfer, id)
 	var i Transfer
 	err := row.Scan(
 		&i.ID,
@@ -71,7 +71,7 @@ type GetTransfersByBothAccountsParams struct {
 }
 
 func (q *Queries) GetTransfersByBothAccounts(ctx context.Context, arg GetTransfersByBothAccountsParams) ([]Transfer, error) {
-	rows, err := q.db.QueryContext(ctx, getTransfersByBothAccounts,
+	rows, err := q.db.Query(ctx, getTransfersByBothAccounts,
 		arg.FromAccountID,
 		arg.ToAccountID,
 		arg.Limit,
@@ -95,9 +95,6 @@ func (q *Queries) GetTransfersByBothAccounts(ctx context.Context, arg GetTransfe
 		}
 		items = append(items, i)
 	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
@@ -118,7 +115,7 @@ type GetTransfersByFromAccountParams struct {
 }
 
 func (q *Queries) GetTransfersByFromAccount(ctx context.Context, arg GetTransfersByFromAccountParams) ([]Transfer, error) {
-	rows, err := q.db.QueryContext(ctx, getTransfersByFromAccount, arg.FromAccountID, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, getTransfersByFromAccount, arg.FromAccountID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -136,9 +133,6 @@ func (q *Queries) GetTransfersByFromAccount(ctx context.Context, arg GetTransfer
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -160,7 +154,7 @@ type GetTransfersByToAccountParams struct {
 }
 
 func (q *Queries) GetTransfersByToAccount(ctx context.Context, arg GetTransfersByToAccountParams) ([]Transfer, error) {
-	rows, err := q.db.QueryContext(ctx, getTransfersByToAccount, arg.ToAccountID, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, getTransfersByToAccount, arg.ToAccountID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -178,9 +172,6 @@ func (q *Queries) GetTransfersByToAccount(ctx context.Context, arg GetTransfersB
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -201,7 +192,7 @@ type ListTransfersParams struct {
 }
 
 func (q *Queries) ListTransfers(ctx context.Context, arg ListTransfersParams) ([]Transfer, error) {
-	rows, err := q.db.QueryContext(ctx, listTransfers, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, listTransfers, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -219,9 +210,6 @@ func (q *Queries) ListTransfers(ctx context.Context, arg ListTransfersParams) ([
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

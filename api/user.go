@@ -1,13 +1,12 @@
 package api
 
 import (
-	"database/sql"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/lib/pq"
+	"github.com/jackc/pgx/v5"
 	db "github.com/santinofajardo/simpleBank/db/sqlc"
 	"github.com/santinofajardo/simpleBank/util"
 )
@@ -58,12 +57,9 @@ func (server *Server) createUser(ctx *gin.Context) {
 	}
 	createdUser, err := server.store.CreateUser(ctx, args)
 	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok { // get the postgres error
-			switch pqErr.Code.Name() {
-			case "unique_violation":
-				ctx.JSON(http.StatusForbidden, errorResponse(err))
-				return
-			}
+		if errCode := db.ErrorCode(err); errCode == "23503" || errCode == "23505" { // get the postgres error
+			ctx.JSON(http.StatusForbidden, errorResponse(err))
+			return
 		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -96,7 +92,7 @@ func (server *Server) loginUser(ctx *gin.Context) {
 
 	user, err := server.store.GetUser(ctx, req.UserName)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			ctx.JSON(http.StatusBadRequest, errorResponse(err))
 			return
 		}

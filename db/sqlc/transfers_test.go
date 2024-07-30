@@ -18,7 +18,7 @@ func createRandomTransfer(t *testing.T) Transfer {
 		Amount:        util.RandomMoney(),
 	}
 
-	transfer, err := testQueries.CreateTransfer(context.Background(), args)
+	transfer, err := testStore.CreateTransfer(context.Background(), args)
 
 	// Tests
 	require.NoError(t, err)
@@ -37,7 +37,7 @@ func TestCreateTransfer(t *testing.T) {
 func TestGetTransfer(t *testing.T) {
 	transfer1 := createRandomTransfer(t)
 
-	transfer2, err := testQueries.GetTransfer(context.Background(), transfer1.ID)
+	transfer2, err := testStore.GetTransfer(context.Background(), transfer1.ID)
 
 	// Tests
 	require.NoError(t, err)

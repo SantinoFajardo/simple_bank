@@ -2,10 +2,11 @@ package gapi
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"time"
 
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 	db "github.com/santinofajardo/simpleBank/db/sqlc"
 	"github.com/santinofajardo/simpleBank/pb"
 	"github.com/santinofajardo/simpleBank/util"
@@ -31,11 +32,11 @@ func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 
 	arg := db.UpdateUserParams{
 		Username: payload.UserName,
-		FullName: sql.NullString{
+		FullName: pgtype.Text{
 			String: req.GetFullName(),
 			Valid:  req.FullName != nil,
 		},
-		Email: sql.NullString{
+		Email: pgtype.Text{
 			String: req.GetEmail(),
 			Valid:  req.Email != nil,
 		},
@@ -46,13 +47,13 @@ func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "error to hash the password: %s", err)
 		}
-		arg.HashedPassword = sql.NullString{String: hashedPassword, Valid: true}
-		arg.PasswordChangedAt = sql.NullTime{Time: time.Now(), Valid: true}
+		arg.HashedPassword = pgtype.Text{String: hashedPassword, Valid: true}
+		arg.PasswordChangedAt = pgtype.Timestamptz{Time: time.Now(), Valid: true}
 	}
 
 	user, err := server.store.UpdateUser(ctx, arg)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			return nil, status.Errorf(codes.NotFound, "any user axist with that username")
 		}
 		err := fmt.Errorf("error to create user: %s", err)

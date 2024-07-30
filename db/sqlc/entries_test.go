@@ -18,7 +18,7 @@ func createRandomEntrie(t *testing.T) Entry {
 
 	defer deleteAccountByID(account.ID)
 
-	entrie, err := testQueries.CreateEntrie(context.Background(), args)
+	entrie, err := testStore.CreateEntrie(context.Background(), args)
 
 	// Tests
 	require.NoError(t, err)
@@ -37,7 +37,7 @@ func TestCreateEntrie(t *testing.T) {
 
 func TestGetEntrie(t *testing.T) {
 	entrie1 := createRandomEntrie(t)
-	entrie2, err := testQueries.GetEntrie(context.Background(), entrie1.ID)
+	entrie2, err := testStore.GetEntrie(context.Background(), entrie1.ID)
 
 	// Tests
 	require.NoError(t, err)
