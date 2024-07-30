@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lib/pq"
 	db "github.com/santinofajardo/simpleBank/db/sqlc"
 	"github.com/santinofajardo/simpleBank/pb"
 	"github.com/santinofajardo/simpleBank/util"
@@ -53,11 +52,8 @@ func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 
 	user, err := server.store.UpdateUser(ctx, arg)
 	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok {
-			switch pqErr.Code.Name() {
-			case "unique_violation":
-				return nil, status.Errorf(codes.AlreadyExists, "user name already exist")
-			}
+		if err == sql.ErrNoRows {
+			return nil, status.Errorf(codes.NotFound, "any user axist with that username")
 		}
 		err := fmt.Errorf("error to create user: %s", err)
 		return nil, status.Errorf(codes.Internal, err.Error())

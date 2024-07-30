@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	. "github.com/santinofajardo/simpleBank/token"
+	"github.com/santinofajardo/simpleBank/token"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -14,7 +14,7 @@ const (
 	authorizatioBearerKey = "bearer"
 )
 
-func (server *Server) authorizeUser(ctx context.Context) (*Payload, error) {
+func (server *Server) authorizeUser(ctx context.Context) (*token.Payload, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, fmt.Errorf("cannot get metadata")
