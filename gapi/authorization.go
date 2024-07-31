@@ -14,7 +14,7 @@ const (
 	authorizatioBearerKey = "bearer"
 )
 
-func (server *Server) authorizeUser(ctx context.Context) (*token.Payload, error) {
+func (server *Server) authorizeUser(ctx context.Context, authorizationRoles []string) (*token.Payload, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, fmt.Errorf("cannot get metadata")
@@ -40,5 +40,18 @@ func (server *Server) authorizeUser(ctx context.Context) (*token.Payload, error)
 		return nil, fmt.Errorf("invalid token: %s", err)
 	}
 
+	if !hasPermission(authorizationRoles, payload.Role) {
+		return nil, fmt.Errorf("permissio denied")
+	}
+
 	return payload, nil
+}
+
+func hasPermission(authorizationRoles []string, userRole string) bool {
+	for _, role := range authorizationRoles {
+		if role == userRole {
+			return true
+		}
+	}
+	return false
 }

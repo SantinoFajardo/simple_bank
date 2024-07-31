@@ -17,7 +17,7 @@ import (
 )
 
 func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UpdateUserResponse, error) {
-	payload, err := server.authorizeUser(ctx)
+	payload, err := server.authorizeUser(ctx, []string{util.DepositorRole, util.BankerRole})
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "Unaunthenticated")
 	}

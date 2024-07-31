@@ -32,8 +32,8 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func newContextWithBearerToken(t *testing.T, tokenMaker token.Maker, username string, timeDuration time.Duration) context.Context {
-	accessToken, _, err := tokenMaker.CreateToken(username, timeDuration)
+func newContextWithBearerToken(t *testing.T, tokenMaker token.Maker, username string, role string, timeDuration time.Duration) context.Context {
+	accessToken, _, err := tokenMaker.CreateToken(username, role, timeDuration)
 	require.NoError(t, err)
 	bearerToken := fmt.Sprintf("%s %s", authorizatioBearerKey, accessToken)
 	md := metadata.MD{

@@ -32,12 +32,12 @@ func (server *Server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 		return nil, status.Errorf(codes.Unauthenticated, "wrong password: %s", err)
 	}
 
-	accessToken, accessPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.TokenDuration)
+	accessToken, accessPayload, err := server.tokenMaker.CreateToken(user.Username, user.Role, server.config.TokenDuration)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "error generating access token: %s", err)
 	}
 
-	refreshToken, refresh_payload, err := server.tokenMaker.CreateToken(user.Username, server.config.RefreshTokenDuration)
+	refreshToken, refresh_payload, err := server.tokenMaker.CreateToken(user.Username, user.Role, server.config.RefreshTokenDuration)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "error generating refresh token: %s", err)
 	}
